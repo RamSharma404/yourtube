@@ -137,7 +137,12 @@ export default function VideoPlayer({
         Your browser does not support the video tag.
       </video>
 
-
+      {/* Leave the bottom strip free so the native video controls stay clickable */}
+      <div className="absolute inset-x-0 top-0 bottom-[80px] grid grid-cols-3 pointer-events-auto">
+        {(["left", "center", "right"] as const).map((zone) => (
+          <TapZone key={zone} zone={zone} onAction={handleTapAction} />
+        ))}
+      </div>
 
       {watchBlocked && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 p-6 text-center text-white z-50">
@@ -156,4 +161,28 @@ export default function VideoPlayer({
   );
 }
 
+function TapZone({
+  zone,
+  onAction,
+}: {
+  zone: "left" | "center" | "right";
+  onAction: (zone: "left" | "center" | "right", taps: number) => void;
+}) {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tapCountRef = useRef(0);
 
+  const handleClick = () => {
+    tapCountRef.current += 1;
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      onAction(zone, tapCountRef.current);
+      tapCountRef.current = 0;
+    }, 260);
+  };
+
+  return <button type="button" className="h-full w-full cursor-pointer bg-transparent" onClick={handleClick} />;
+}
