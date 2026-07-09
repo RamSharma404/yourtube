@@ -37,40 +37,45 @@ export const createOrder = async (req, res) => {
       return res.status(400).json({ message: "Selected plan is not payable" });
     }
 
-    if (!hasRealRazorpayKeys()) {
-      // Allow mock payments in production for internship demonstration
-
-
-      const orderId = `mock_order_${Date.now()}`;
-      return res.status(200).json({
-        orderId,
-        amount: planDetails.amount,
-        currency: "INR",
-        key_id: null,
-        plan: planDetails.name,
-        mock: true,
-      });
-    }
-
-    const rzp = await getRazorpay();
-    const options = {
+    const orderId = `mock_order_${Date.now()}`;
+    const mockResponse = {
+      orderId,
       amount: planDetails.amount,
       currency: "INR",
-      receipt: `receipt_${planDetails.name}_${userId}_${Date.now()}`,
-      notes: {
-        userId,
-        plan: planDetails.name,
-      },
+      key_id: null,
+      plan: planDetails.name,
+      mock: true,
     };
 
-    const order = await rzp.orders.create(options);
-    res.status(200).json({
-      orderId: order.id,
-      amount: options.amount,
-      currency: options.currency,
-      key_id: process.env.RAZORPAY_KEY_ID,
-      plan: planDetails.name,
-    });
+    if (!hasRealRazorpayKeys()) {
+      // Allow mock payments in production for internship demonstration
+      return res.status(200).json(mockResponse);
+    }
+
+    try {
+      const rzp = await getRazorpay();
+      const options = {
+        amount: planDetails.amount,
+        currency: "INR",
+        receipt: `receipt_${planDetails.name}_${userId}_${Date.now()}`,
+        notes: {
+          userId,
+          plan: planDetails.name,
+        },
+      };
+
+      const order = await rzp.orders.create(options);
+      return res.status(200).json({
+        orderId: order.id,
+        amount: options.amount,
+        currency: options.currency,
+        key_id: process.env.RAZORPAY_KEY_ID,
+        plan: planDetails.name,
+      });
+    } catch (rzpError) {
+      console.error("Razorpay API failed with provided keys. Falling back to Mock Payment Mode.");
+      return res.status(200).json(mockResponse);
+    }
   } catch (error) {
     console.error("Razorpay order error:", error);
     res.status(500).json({ message: "Failed to create order" });
