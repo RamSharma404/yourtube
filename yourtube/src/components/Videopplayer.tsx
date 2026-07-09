@@ -47,7 +47,7 @@ export default function VideoPlayer({
         if (!user?._id || element.paused) return;
         
         try {
-          await axiosInstance.post("/watch-heartbeat", {
+          await axiosInstance.post("/user/watch-heartbeat", {
             userId: user._id,
             secondsWatched: 5,
           });
@@ -122,11 +122,12 @@ export default function VideoPlayer({
   };
 
   return (
-    <div className="relative aspect-video overflow-hidden rounded-2xl bg-black">
+    <div className="relative aspect-video overflow-hidden rounded-2xl bg-black group">
       <video
         ref={videoRef}
         className="h-full w-full"
         controls
+        controlsList="nodownload"
         poster={`/placeholder.svg?height=480&width=854`}
       >
         <source
@@ -136,19 +137,7 @@ export default function VideoPlayer({
         Your browser does not support the video tag.
       </video>
 
-      {/* Leave the bottom strip free so the native video controls stay clickable */}
-      <div className="absolute inset-x-0 top-0 bottom-16 grid grid-cols-3">
-        {(["left", "center", "right"] as const).map((zone) => (
-          <TapZone key={zone} zone={zone} onAction={handleTapAction} />
-        ))}
-      </div>
 
-      <div className="pointer-events-none absolute bottom-4 left-4 flex gap-2 text-white">
-        <GestureChip icon={<SkipForward className="h-4 w-4" />} label="Double tap sides: 10s seek" />
-        <GestureChip icon={paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />} label="Single center tap: play/pause" />
-        <GestureChip icon={<MessageSquare className="h-4 w-4" />} label="Triple left: comments" />
-        <GestureChip icon={<X className="h-4 w-4" />} label="Triple right: close" />
-      </div>
 
       {watchBlocked && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 p-6 text-center text-white z-50">
@@ -167,37 +156,4 @@ export default function VideoPlayer({
   );
 }
 
-function TapZone({
-  zone,
-  onAction,
-}: {
-  zone: "left" | "center" | "right";
-  onAction: (zone: "left" | "center" | "right", taps: number) => void;
-}) {
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const tapCountRef = useRef(0);
 
-  const handleClick = () => {
-    tapCountRef.current += 1;
-
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    timeoutRef.current = setTimeout(() => {
-      onAction(zone, tapCountRef.current);
-      tapCountRef.current = 0;
-    }, 260);
-  };
-
-  return <button type="button" className="h-full w-full cursor-pointer bg-transparent" onClick={handleClick} />;
-}
-
-function GestureChip({ icon, label }: { icon: ReactNode; label: string }) {
-  return (
-    <div className="hidden rounded-full bg-black/60 px-3 py-1 text-xs backdrop-blur md:flex md:items-center md:gap-2">
-      {icon}
-      <span>{label}</span>
-    </div>
-  );
-}
