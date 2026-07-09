@@ -158,13 +158,17 @@ export const verifyPayment = async (req, res) => {
       { new: true }
     );
 
-    await sendInvoiceEmail({
-      user: updatedUser,
-      plan: selectedPlan.name,
-      amount: selectedPlan.amount,
-      invoiceNumber,
-      invoicePath,
-    });
+    try {
+      await sendInvoiceEmail({
+        user: updatedUser,
+        plan: selectedPlan.name,
+        amount: selectedPlan.amount,
+        invoiceNumber,
+        invoicePath,
+      });
+    } catch (emailError) {
+      console.error("Failed to send invoice email (SMTP error), but payment succeeded:", emailError);
+    }
 
     res.status(200).json({
       message: "Payment verified, plan activated",
