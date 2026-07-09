@@ -15,7 +15,7 @@ import axiosInstance from "@/lib/axiosinstance";
 import { useUser } from "@/lib/AuthContext";
 
 const Channeldialogue = ({ isopen, onclose, channeldata, mode }: any) => {
-  const { user, login } = useUser();
+  const { user, setUser } = useUser();
   // const user: any = {
   //   id: "1",
   //   name: "John Doe",
@@ -57,7 +57,7 @@ const Channeldialogue = ({ isopen, onclose, channeldata, mode }: any) => {
       `/user/update/${user._id}`,
       payload
     );
-    login(response?.data);
+    setUser(response?.data);
     router.push(`/channel/${user?._id}`);
     setFormData({
       name: "",

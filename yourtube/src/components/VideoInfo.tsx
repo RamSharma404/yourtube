@@ -12,6 +12,8 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { useUser } from "@/lib/AuthContext";
 import axiosInstance from "@/lib/axiosinstance";
+import { useRouter } from "next/router";
+import PremiumModal from "./PremiumModal";
 
 const VideoInfo = ({ video }: any) => {
   const [likes, setlikes] = useState(video.Like || 0);
@@ -21,6 +23,8 @@ const VideoInfo = ({ video }: any) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const { user } = useUser();
   const [isWatchLater, setIsWatchLater] = useState(false);
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const router = useRouter();
 
   // const user: any = {
   //   id: "1",
@@ -111,6 +115,34 @@ const VideoInfo = ({ video }: any) => {
       console.log(error);
     }
   };
+
+  const handleDownload = async () => {
+    if (!user) return;
+    try {
+      const response = await axiosInstance.get(`/download/file/${video._id}?userId=${user._id}`, {
+        responseType: "blob",
+      });
+      const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `${video.filename || video.videotitle}.mp4`;
+      link.click();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        "Download failed. Upgrade your plan for unlimited downloads.";
+      if (error?.response?.status === 403) {
+        setShowPlanModal(true);
+      }
+      alert(message);
+    }
+  };
+
+  const handleStartCall = () => {
+    const roomId = `${video._id}-${Date.now().toString(36)}`;
+    router.push(`/call/${roomId}?videoId=${video._id}`);
+  };
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">{video.videotitle}</h1>
@@ -171,14 +203,16 @@ const VideoInfo = ({ video }: any) => {
             variant="ghost"
             size="sm"
             className="bg-gray-100 rounded-full"
+            onClick={handleStartCall}
           >
             <Share className="w-5 h-5 mr-2" />
-            Share
+            Watch together
           </Button>
           <Button
             variant="ghost"
             size="sm"
             className="bg-gray-100 rounded-full"
+            onClick={handleDownload}
           >
             <Download className="w-5 h-5 mr-2" />
             Download
@@ -212,6 +246,11 @@ const VideoInfo = ({ video }: any) => {
           {showFullDescription ? "Show less" : "Show more"}
         </Button>
       </div>
+      <PremiumModal
+        isOpen={showPlanModal}
+        onClose={() => setShowPlanModal(false)}
+        selectedPlan={user?.plan || "Gold"}
+      />
     </div>
   );
 };

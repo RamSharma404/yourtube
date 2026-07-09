@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Channeldialogue from "./channeldialogue";
 import { useRouter } from "next/router";
 import { useUser } from "@/lib/AuthContext";
+import PremiumModal from "./PremiumModal";
 
 const Header = () => {
   const { user, logout, handlegooglesignin } = useUser();
@@ -25,6 +26,7 @@ const Header = () => {
   // };
   const [searchQuery, setSearchQuery] = useState("");
   const [isdialogeopen, setisdialogeopen] = useState(false);
+  const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const router = useRouter();
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +40,7 @@ const Header = () => {
     }
   };
   return (
-    <header className="flex items-center justify-between px-4 py-2 bg-white border-b">
+    <header className="flex items-center justify-between px-4 py-2 bg-background border-b">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon">
           <Menu className="w-6 h-6" />
@@ -98,7 +100,10 @@ const Header = () => {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+                <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                  Plan: <span className="font-semibold text-foreground">{user?.plan || "Free"}</span>
+                </div>
                 {user?.channelname ? (
                   <DropdownMenuItem asChild>
                     <Link href={`/channel/${user?._id}`}>Your channel</Link>
@@ -124,6 +129,15 @@ const Header = () => {
                 <DropdownMenuItem asChild>
                   <Link href="/watch-later">Watch later</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/downloads">Downloads</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/call">Video calls</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIsPlanModalOpen(true)}>
+                  Upgrade plan
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout}>Sign out</DropdownMenuItem>
               </DropdownMenuContent>
@@ -145,6 +159,11 @@ const Header = () => {
         isopen={isdialogeopen}
         onclose={() => setisdialogeopen(false)}
         mode="create"
+      />
+      <PremiumModal
+        isOpen={isPlanModalOpen}
+        onClose={() => setIsPlanModalOpen(false)}
+        selectedPlan={user?.plan || "Gold"}
       />
     </header>
   );
