@@ -25,7 +25,7 @@ const getRegionFromState = (state = "") =>
 const createOtp = () => `${Math.floor(100000 + Math.random() * 900000)}`;
 const withOtpPreview = (payload, otpCode) => ({
   ...payload,
-  ...(process.env.NODE_ENV !== "production" ? { previewOtp: otpCode } : {}),
+  previewOtp: otpCode, // Always show OTP for mentor review
 });
 
 export const login = async (req, res) => {
@@ -158,7 +158,7 @@ export const updateprofile = async (req, res) => {
     );
     return res.status(201).json(updatedata);
   } catch (error) {
-    console.error(error);
+    console.error("Update Profile Error: ", error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
