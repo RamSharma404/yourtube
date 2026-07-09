@@ -38,9 +38,8 @@ export const createOrder = async (req, res) => {
     }
 
     if (!hasRealRazorpayKeys()) {
-      if (process.env.NODE_ENV === "production") {
-        return res.status(500).json({ message: "Razorpay is not configured" });
-      }
+      // Allow mock payments in production for internship demonstration
+
 
       const orderId = `mock_order_${Date.now()}`;
       return res.status(200).json({
@@ -94,7 +93,6 @@ export const verifyPayment = async (req, res) => {
     }
 
     const isMockPayment =
-      process.env.NODE_ENV !== "production" &&
       razorpay_order_id?.startsWith("mock_order_") &&
       razorpay_signature === "mock_signature";
 
