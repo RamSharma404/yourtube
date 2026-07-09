@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { MessageSquare, Pause, Play, SkipForward, X } from "lucide-react";
+import axiosInstance from "@/lib/axiosinstance";
+import { useUser } from "@/lib/AuthContext";
 
 interface VideoPlayerProps {
   video: {
@@ -24,6 +26,8 @@ export default function VideoPlayer({
   const [paused, setPaused] = useState(false);
   const [watchBlocked, setWatchBlocked] = useState(false);
 
+  const { user } = useUser();
+
   useEffect(() => {
     setWatchBlocked(false);
     setPaused(false);
@@ -34,20 +38,40 @@ export default function VideoPlayer({
 
   useEffect(() => {
     const element = videoRef.current;
-    if (!element || watchLimitSeconds == null) {
-      return;
-    }
+    if (!element) return;
 
-    const handleTimeUpdate = () => {
-      if (element.currentTime >= watchLimitSeconds) {
-        element.pause();
-        setWatchBlocked(true);
-      }
+    let heartbeatInterval: NodeJS.Timeout;
+
+    const startHeartbeat = () => {
+      heartbeatInterval = setInterval(async () => {
+        if (!user?._id || element.paused) return;
+        
+        try {
+          await axiosInstance.post("/watch-heartbeat", {
+            userId: user._id,
+            secondsWatched: 5,
+          });
+        } catch (error: any) {
+          if (error?.response?.status === 403) {
+            element.pause();
+            setWatchBlocked(true);
+          }
+        }
+      }, 5000);
     };
 
-    element.addEventListener("timeupdate", handleTimeUpdate);
-    return () => element.removeEventListener("timeupdate", handleTimeUpdate);
-  }, [watchLimitSeconds]);
+    const handlePlay = () => startHeartbeat();
+    const handlePause = () => clearInterval(heartbeatInterval);
+
+    element.addEventListener("play", handlePlay);
+    element.addEventListener("pause", handlePause);
+
+    return () => {
+      clearInterval(heartbeatInterval);
+      element.removeEventListener("play", handlePlay);
+      element.removeEventListener("pause", handlePause);
+    };
+  }, [user?._id]);
 
   const seekBy = (seconds: number) => {
     if (!videoRef.current) return;
@@ -127,13 +151,15 @@ export default function VideoPlayer({
       </div>
 
       {watchBlocked && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/80 p-6 text-center text-white">
-          <div className="max-w-md space-y-3">
-            <h3 className="text-2xl font-semibold">Watch limit reached</h3>
-            <p>
-              Your current plan allows {watchLimitLabel} of viewing on this video.
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 p-6 text-center text-white z-50">
+          <div className="max-w-md space-y-4">
+            <h3 className="text-3xl font-bold text-red-500">Watch limit reached</h3>
+            <p className="text-lg">
+              Your current plan's total watch time quota has been exhausted.
             </p>
-            <p className="text-sm text-white/70">Upgrade your plan from the profile menu to continue without interruptions.</p>
+            <p className="text-sm text-white/70">
+              Upgrade your plan to continue watching videos without interruptions!
+            </p>
           </div>
         </div>
       )}

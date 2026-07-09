@@ -1,5 +1,5 @@
 export const PLAN_DETAILS = {
-  Free: { name: "Free", amount: 0, watchLimitSeconds: 300, isPremium: false },
+  Free: { name: "Free", amount: 0, watchLimitSeconds: 10, isPremium: false },
   Bronze: { name: "Bronze", amount: 1000, watchLimitSeconds: 420, isPremium: true },
   Silver: { name: "Silver", amount: 5000, watchLimitSeconds: 600, isPremium: true },
   Gold: { name: "Gold", amount: 10000, watchLimitSeconds: null, isPremium: true },

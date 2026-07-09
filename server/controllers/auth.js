@@ -162,3 +162,38 @@ export const updateprofile = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
+
+export const watchHeartbeat = async (req, res) => {
+  const { userId, secondsWatched = 5 } = req.body;
+  
+  if (!userId) {
+    return res.status(400).json({ message: "User ID required" });
+  }
+
+  try {
+    const user = await users.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Always increment watch time
+    user.totalWatchSeconds = (user.totalWatchSeconds || 0) + secondsWatched;
+    await user.save();
+
+    // Check if limit is reached (and it's not unlimited/null)
+    if (user.planWatchLimitSeconds !== null && user.totalWatchSeconds >= user.planWatchLimitSeconds) {
+      return res.status(403).json({ 
+        message: "Watch limit reached", 
+        totalWatchSeconds: user.totalWatchSeconds,
+        limitReached: true,
+        plan: user.plan
+      });
+    }
+
+    return res.status(200).json({ 
+      totalWatchSeconds: user.totalWatchSeconds,
+      limitReached: false 
+    });
+  } catch (error) {
+    console.error("Watch heartbeat error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
