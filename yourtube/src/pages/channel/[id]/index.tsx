@@ -49,14 +49,14 @@ const index = () => {
       },
     ];
     return (
-      <div className="flex-1 min-h-screen bg-white">
-        <div className="max-w-full mx-auto">
+      <div className="flex-1 min-h-screen bg-background">
+        <div className="max-w-7xl mx-auto pb-16">
           <ChannelHeader channel={channel} user={user} />
           <Channeltabs />
-          <div className="px-4 pb-8">
+          <div className="px-4 md:px-12 mt-8">
             <VideoUploader channelId={id} channelName={channel?.channelname} />
           </div>
-          <div className="px-4 pb-8">
+          <div className="px-4 md:px-12 mt-8">
             <ChannelVideos videos={videos} />
           </div>
         </div>

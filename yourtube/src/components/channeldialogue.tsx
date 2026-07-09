@@ -53,8 +53,14 @@ const Channeldialogue = ({ isopen, onclose, channeldata, mode }: any) => {
       channelname: formData.name,
       description: formData.description,
     };
+    const userId = user?._id || user?.id;
+    if (!userId) {
+      console.error("Cannot update channel: User ID is missing", user);
+      alert("Error: User session is invalid. Please log in again.");
+      return;
+    }
     const response = await axiosInstance.patch(
-      `/user/update/${user._id}`,
+      `/user/update/${userId}`,
       payload
     );
     setUser(response?.data);
