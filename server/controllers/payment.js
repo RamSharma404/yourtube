@@ -159,12 +159,15 @@ export const verifyPayment = async (req, res) => {
     );
 
     try {
-      await sendInvoiceEmail({
+      // Fire and forget: don't await the email so the UI responds instantly!
+      sendInvoiceEmail({
         user: updatedUser,
         plan: selectedPlan.name,
         amount: selectedPlan.amount,
         invoiceNumber,
         invoicePath,
+      }).catch(emailError => {
+        console.error("Failed to send invoice email in background:", emailError);
       });
     } catch (emailError) {
       console.error("Failed to send invoice email (SMTP error), but payment succeeded:", emailError);
