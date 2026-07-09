@@ -37,6 +37,12 @@ export const createOrder = async (req, res) => {
       return res.status(400).json({ message: "Selected plan is not payable" });
     }
 
+    if (user.isPremium && user.premiumExpiry && new Date(user.premiumExpiry) > new Date()) {
+      return res.status(400).json({ 
+        message: `You already have an active ${user.plan || "Premium"} plan that expires on ${new Date(user.premiumExpiry).toLocaleDateString()}. You cannot buy a new plan until your current one expires.` 
+      });
+    }
+
     const orderId = `mock_order_${Date.now()}`;
     const mockResponse = {
       orderId,

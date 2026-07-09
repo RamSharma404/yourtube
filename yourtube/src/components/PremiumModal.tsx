@@ -115,9 +115,9 @@ const PremiumModal = ({ isOpen, onClose, selectedPlan = "Gold" }: PremiumModalPr
 
       const rzp = new window.Razorpay(options);
       rzp.open();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Upgrade error:", error);
-      alert("Something went wrong while upgrading the plan.");
+      alert(error?.response?.data?.message || "Something went wrong while upgrading the plan.");
     } finally {
       setLoadingPlan(null);
     }
