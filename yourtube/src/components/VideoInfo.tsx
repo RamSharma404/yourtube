@@ -95,22 +95,24 @@ const VideoInfo = ({ video }: any) => {
   const handleDislike = async () => {
     if (!user) return;
     try {
-      const res = await axiosInstance.post(`/like/${video._id}`, {
-        userId: user?._id,
-      });
-      if (!res.data.liked) {
-        if (isDisliked) {
-          setDislikes((prev: any) => prev - 1);
-          setIsDisliked(false);
-        } else {
-          setDislikes((prev: any) => prev + 1);
-          setIsDisliked(true);
-          if (isLiked) {
-            setlikes((prev: any) => prev - 1);
-            setIsLiked(false);
-          }
-        }
+      if (isDisliked) {
+        setDislikes((prev: any) => prev - 1);
+        setIsDisliked(false);
+        return;
       }
+
+      // Remove an existing like on the server before marking as disliked,
+      // so stored like counts stay consistent.
+      if (isLiked) {
+        await axiosInstance.post(`/like/${video._id}`, {
+          userId: user?._id,
+        });
+        setlikes((prev: any) => prev - 1);
+        setIsLiked(false);
+      }
+
+      setDislikes((prev: any) => prev + 1);
+      setIsDisliked(true);
     } catch (error) {
       console.log(error);
     }

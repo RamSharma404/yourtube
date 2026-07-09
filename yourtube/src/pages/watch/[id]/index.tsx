@@ -3,7 +3,6 @@ import RelatedVideos from "@/components/RelatedVideos";
 import VideoInfo from "@/components/VideoInfo";
 import Videopplayer from "@/components/Videopplayer";
 import axiosInstance from "@/lib/axiosinstance";
-import { notFound } from "next/navigation";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
 import { useUser } from "@/lib/AuthContext";
@@ -62,6 +61,14 @@ const index = () => {
   //     createdAt: new Date(Date.now() - 86400000).toISOString(),
   //   },
   // ];
+  // Gold plan (or any plan with a null limit) means unlimited watch time.
+  // Guests and Free users default to the 5 minute (300s) limit.
+  const watchLimitSeconds = !user
+    ? 300
+    : user.plan === "Gold" || user.planWatchLimitSeconds === null
+    ? null
+    : user.planWatchLimitSeconds ?? 300;
+
   if (loading) {
     return <div>Loading..</div>;
   }
@@ -76,7 +83,7 @@ const index = () => {
           <div className="lg:col-span-2 space-y-4">
             <Videopplayer
               video={videos}
-              watchLimitSeconds={user?.planWatchLimitSeconds ?? 300}
+              watchLimitSeconds={watchLimitSeconds}
               nextVideoId={video?.find((item: any) => item._id !== id)?._id || null}
               onOpenComments={() =>
                 commentsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })

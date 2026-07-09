@@ -138,6 +138,7 @@ const Comments = ({ videoId }: { videoId: string | string[] | undefined }) => {
       }));
     } catch (error) {
       console.error(error);
+      alert("Translation failed. Please try again.");
     }
   };
 

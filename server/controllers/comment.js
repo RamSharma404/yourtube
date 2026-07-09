@@ -133,16 +133,27 @@ export const translateComment = async (req, res) => {
       return res.status(400).json({ message: "Unsupported target language" });
     }
 
-    const response = await axios.get("https://api.mymemory.translated.net/get", {
-      params: {
-        q: text,
-        langpair: `auto|${targetLanguage}`,
-      },
-    });
+    // MyMemory does not support "auto" as a source language, which broke
+    // translations. The Google gtx endpoint supports auto-detection.
+    const response = await axios.get(
+      "https://translate.googleapis.com/translate_a/single",
+      {
+        params: {
+          client: "gtx",
+          sl: "auto",
+          tl: targetLanguage,
+          dt: "t",
+          q: text,
+        },
+      }
+    );
+
+    const translatedText = Array.isArray(response.data?.[0])
+      ? response.data[0].map((segment) => segment?.[0] || "").join("")
+      : "";
 
     return res.status(200).json({
-      translatedText:
-        response.data?.responseData?.translatedText || text,
+      translatedText: translatedText || text,
     });
   } catch (error) {
     console.error("translation error:", error);

@@ -23,6 +23,12 @@ export default function VideoPlayer({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [paused, setPaused] = useState(false);
   const [watchBlocked, setWatchBlocked] = useState(false);
+
+  useEffect(() => {
+    setWatchBlocked(false);
+    setPaused(false);
+  }, [video?._id]);
+
   const watchLimitLabel =
     watchLimitSeconds == null ? "unlimited" : `${Math.floor(watchLimitSeconds / 60)} minutes`;
 
@@ -106,7 +112,8 @@ export default function VideoPlayer({
         Your browser does not support the video tag.
       </video>
 
-      <div className="absolute inset-0 grid grid-cols-3">
+      {/* Leave the bottom strip free so the native video controls stay clickable */}
+      <div className="absolute inset-x-0 top-0 bottom-16 grid grid-cols-3">
         {(["left", "center", "right"] as const).map((zone) => (
           <TapZone key={zone} zone={zone} onAction={handleTapAction} />
         ))}
