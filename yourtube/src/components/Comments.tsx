@@ -194,7 +194,7 @@ const Comments = ({ videoId }: { videoId: string | string[] | undefined }) => {
 
       <div className="space-y-4">
         {comments.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">No comments yet. Be the first to comment!</p>
+          <p className="text-sm text-muted-foreground italic">No comments yet. Be the first to comment!</p>
         ) : (
           comments.map((comment) => (
             <div key={comment._id} className="flex gap-4">
@@ -205,8 +205,8 @@ const Comments = ({ videoId }: { videoId: string | string[] | undefined }) => {
               <div className="flex-1">
                 <div className="mb-1 flex items-center gap-2">
                   <span className="font-medium text-sm">{comment.usercommented}</span>
-                  {comment.city && <span className="text-xs text-gray-500">{comment.city}</span>}
-                  <span className="text-xs text-gray-600">
+                  {comment.city && <span className="text-xs text-muted-foreground">{comment.city}</span>}
+                  <span className="text-xs text-muted-foreground">
                     {formatDistanceToNow(new Date(comment.commentedon))} ago
                   </span>
                 </div>
@@ -240,7 +240,7 @@ const Comments = ({ videoId }: { videoId: string | string[] | undefined }) => {
                         {translatedComments[comment._id]}
                       </p>
                     )}
-                    <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-gray-500">
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                       <button onClick={() => handleReaction(comment._id, "like")} className="inline-flex items-center gap-1">
                         <ThumbsUp className="h-4 w-4" /> {comment.likes || 0}
                       </button>

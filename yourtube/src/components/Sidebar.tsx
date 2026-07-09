@@ -8,93 +8,84 @@ import {
   Download,
   User,
   Phone,
+  type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
+import { useRouter } from "next/router";
 import { Button } from "./ui/button";
 import Channeldialogue from "./channeldialogue";
 import { useUser } from "@/lib/AuthContext";
 
+interface NavItemProps {
+  href: string;
+  icon: LucideIcon;
+  label: string;
+  disabled?: boolean;
+}
+
+const NavItem = ({ href, icon: Icon, label, disabled = false }: NavItemProps) => {
+  const router = useRouter();
+  const active = router.pathname === href;
+
+  const button = (
+    <Button
+      variant="ghost"
+      disabled={disabled}
+      className={`w-full justify-start gap-3 rounded-xl ${
+        active
+          ? "bg-accent font-semibold text-accent-foreground"
+          : "text-foreground/80 hover:bg-accent hover:text-accent-foreground"
+      }`}
+    >
+      <Icon className="h-5 w-5" />
+      <span>{label}</span>
+    </Button>
+  );
+
+  if (disabled) {
+    return <div className="cursor-not-allowed opacity-50">{button}</div>;
+  }
+
+  return <Link href={href}>{button}</Link>;
+};
+
 const Sidebar = () => {
   const { user } = useUser();
-
   const [isdialogeopen, setisdialogeopen] = useState(false);
+
   return (
-    <aside className="w-64 shrink-0 bg-white text-neutral-950 border-r border-gray-200 min-h-screen p-2">
+    <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-60 shrink-0 overflow-y-auto border-r border-border bg-background p-3 md:block">
       <nav className="space-y-1">
-        <Link href="/">
-          <Button variant="ghost" className="w-full justify-start text-neutral-950 hover:bg-gray-100 hover:text-neutral-950">
-            <Home className="w-5 h-5 mr-3" />
-            Home
-          </Button>
-        </Link>
-        <Link href="/explore">
-          <Button variant="ghost" className="w-full justify-start text-neutral-500 disabled:opacity-70" disabled>
-            <Compass className="w-5 h-5 mr-3" />
-            Explore Soon
-          </Button>
-        </Link>
-        <Link href="/subscriptions">
-          <Button variant="ghost" className="w-full justify-start text-neutral-500 disabled:opacity-70" disabled>
-            <PlaySquare className="w-5 h-5 mr-3" />
-            Subscriptions Soon
-          </Button>
-        </Link>
-        <Link href="/call">
-          <Button variant="ghost" className="w-full justify-start text-neutral-950 hover:bg-gray-100 hover:text-neutral-950">
-            <Phone className="w-5 h-5 mr-3" />
-            Video Call
-          </Button>
-        </Link>
+        <NavItem href="/" icon={Home} label="Home" />
+        <NavItem href="/explore" icon={Compass} label="Explore" disabled />
+        <NavItem href="/subscriptions" icon={PlaySquare} label="Subscriptions" disabled />
+        <NavItem href="/call" icon={Phone} label="Video Call" />
 
         {user && (
-          <>
-            <div className="border-t pt-2 mt-2">
-              <Link href="/history">
-                <Button variant="ghost" className="w-full justify-start text-neutral-950 hover:bg-gray-100 hover:text-neutral-950">
-                  <History className="w-5 h-5 mr-3" />
-                  History
+          <div className="mt-3 space-y-1 border-t border-border pt-3">
+            <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              You
+            </p>
+            <NavItem href="/history" icon={History} label="History" />
+            <NavItem href="/liked" icon={ThumbsUp} label="Liked videos" />
+            <NavItem href="/watch-later" icon={Clock} label="Watch later" />
+            <NavItem href="/downloads" icon={Download} label="Downloads" />
+            {user?.channelname ? (
+              <NavItem href={`/channel/${user._id}`} icon={User} label="Your channel" />
+            ) : (
+              <div className="px-2 pt-1.5">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full rounded-xl"
+                  onClick={() => setisdialogeopen(true)}
+                >
+                  Create Channel
                 </Button>
-              </Link>
-              <Link href="/liked">
-                <Button variant="ghost" className="w-full justify-start text-neutral-950 hover:bg-gray-100 hover:text-neutral-950">
-                  <ThumbsUp className="w-5 h-5 mr-3" />
-                  Liked videos
-                </Button>
-              </Link>
-              <Link href="/watch-later">
-                <Button variant="ghost" className="w-full justify-start text-neutral-950 hover:bg-gray-100 hover:text-neutral-950">
-                  <Clock className="w-5 h-5 mr-3" />
-                  Watch later
-                </Button>
-              </Link>
-              <Link href="/downloads">
-                <Button variant="ghost" className="w-full justify-start text-neutral-950 hover:bg-gray-100 hover:text-neutral-950">
-                  <Download className="w-5 h-5 mr-3" />
-                  Downloads
-                </Button>
-              </Link>
-              {user?.channelname ? (
-                <Link href={`/channel/${user._id}`}>
-                  <Button variant="ghost" className="w-full justify-start text-neutral-950 hover:bg-gray-100 hover:text-neutral-950">
-                    <User className="w-5 h-5 mr-3" />
-                    Your channel
-                  </Button>
-                </Link>
-              ) : (
-                <div className="px-2 py-1.5">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => setisdialogeopen(true)}
-                  >
-                    Create Channel
-                  </Button>
-                </div>
-              )}
-            </div>
-          </>
+              </div>
+            )}
+          </div>
         )}
       </nav>
       <Channeldialogue

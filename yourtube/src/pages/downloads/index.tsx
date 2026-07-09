@@ -50,10 +50,10 @@ export default function Downloads() {
       </div>
 
       {loading ? (
-        <div className="text-center py-20 text-gray-500">Loading...</div>
+        <div className="text-center py-20 text-muted-foreground">Loading...</div>
       ) : videos.length === 0 ? (
-        <div className="text-center py-20 text-gray-500">
-          <Download className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+        <div className="text-center py-20 text-muted-foreground">
+          <Download className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
           <p className="text-lg">No downloaded videos yet</p>
           <p className="text-sm">Videos you download will appear here</p>
         </div>
@@ -66,10 +66,12 @@ export default function Downloads() {
               className="group"
             >
               <div className="space-y-3">
-                <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
+                <div className="relative aspect-video rounded-xl overflow-hidden bg-muted">
                   <video
                     src={`${process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL}/${video?.filepath}`}
-                    className="object-cover group-hover:scale-105 transition-transform duration-200"
+                    muted
+                    preload="metadata"
+                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-200"
                   />
                 </div>
                 <div className="flex gap-3">
@@ -77,7 +79,7 @@ export default function Downloads() {
                     <h3 className="font-medium text-sm line-clamp-2">
                       {video?.videotitle}
                     </h3>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       {video?.videochanel}
                     </p>
                   </div>

@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import type { NextComponentType, NextPageContext } from "next";
+import { useEffect } from "react";
 import { UserProvider, useUser } from "../lib/AuthContext";
 
 interface AppShellProps {
@@ -14,10 +15,14 @@ interface AppShellProps {
 
 function AppShell({ Component, pageProps }: AppShellProps) {
   const { appTheme } = useUser();
-  const shellClass =
-    appTheme === "light"
-      ? "min-h-screen bg-white text-black"
-      : "min-h-screen bg-neutral-950 text-neutral-50";
+
+  // Apply the shadcn `dark` class on <html> so every themed component,
+  // including portaled dialogs and dropdowns, follows the app theme.
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", appTheme !== "light");
+  }, [appTheme]);
+
+  const shellClass = "min-h-screen bg-background text-foreground";
 
   return (
     <div className={shellClass}>

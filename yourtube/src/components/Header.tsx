@@ -1,4 +1,4 @@
-import { Bell, Menu, Mic, Search, User, VideoIcon } from "lucide-react";
+import { Bell, Crown, Menu, Mic, Search, User, VideoIcon } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -40,7 +40,7 @@ const Header = () => {
     }
   };
   return (
-    <header className="flex items-center justify-between px-4 py-2 bg-background border-b">
+    <header className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon">
           <Menu className="w-6 h-6" />
@@ -52,7 +52,7 @@ const Header = () => {
             </svg>
           </div>
           <span className="text-xl font-medium">YourTube</span>
-          <span className="text-xs text-gray-400 ml-1">IN</span>
+          <span className="text-xs text-muted-foreground ml-1">IN</span>
         </Link>
       </div>
       <form
@@ -70,7 +70,7 @@ const Header = () => {
           />
           <Button
             type="submit"
-            className="rounded-r-full px-6 bg-gray-50 hover:bg-gray-100 text-gray-600 border border-l-0"
+            className="rounded-r-full border border-l-0 border-border bg-muted px-6 text-muted-foreground hover:bg-muted/80"
           >
             <Search className="w-5 h-5" />
           </Button>
@@ -82,6 +82,15 @@ const Header = () => {
       <div className="flex items-center gap-2">
         {user ? (
           <>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="hidden items-center gap-1.5 rounded-full sm:flex"
+              onClick={() => setIsPlanModalOpen(true)}
+            >
+              <Crown className="h-4 w-4 text-amber-500" />
+              {user?.plan && user.plan !== "Free" ? user.plan : "Premium"}
+            </Button>
             <Button variant="ghost" size="icon">
               <VideoIcon className="w-6 h-6" />
             </Button>
