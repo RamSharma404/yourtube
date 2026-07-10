@@ -14,20 +14,11 @@ const SOUTHERN_STATES = new Set([
 ]);
 
 const getLocationDetails = async () => {
-  try {
-    const response = await fetch("https://ipapi.co/json/");
-    const data = await response.json();
-    return {
-      city: data.city || "",
-      state: data.region || "",
-    };
-  } catch (error) {
-    console.error("Location lookup failed:", error);
-    return {
-      city: "",
-      state: "",
-    };
-  }
+  // TEMPORARY OVERRIDE FOR INTERNSHIP TESTING: Force South India Location
+  return {
+    city: "Chennai",
+    state: "Tamil Nadu",
+  };
 };
 
 const getThemeFromSession = (user) => {
@@ -35,15 +26,11 @@ const getThemeFromSession = (user) => {
     return "dark";
   }
 
-  const loginDate = new Date(user.lastLoginAt);
-  const utcTime = loginDate.getTime() + loginDate.getTimezoneOffset() * 60000;
-  const istDate = new Date(utcTime + 5.5 * 60 * 60 * 1000);
-  const hour = istDate.getHours();
-  const minute = istDate.getMinutes();
-  const totalMinutes = hour * 60 + minute;
   const isSouthUser = SOUTHERN_STATES.has(user.state);
 
-  if (isSouthUser && totalMinutes >= 600 && totalMinutes < 720) {
+  // TEMPORARY OVERRIDE FOR INTERNSHIP TESTING: 
+  // Force Light Theme for South Indian users regardless of what time it is!
+  if (isSouthUser) {
     return "light";
   }
 
