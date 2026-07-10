@@ -1,6 +1,7 @@
 import users from "../Modals/Auth.js";
 import video from "../Modals/video.js";
 import path from "path";
+import fs from "fs";
 import { applyPlanToUser, isPremiumActive } from "../utils/plans.js";
 
 export const downloadVideo = async (req, res) => {
@@ -47,6 +48,15 @@ export const downloadVideo = async (req, res) => {
     }
 
     const absolutePath = path.resolve(videodata.filepath);
+    
+    // Check if the physical file actually exists on the disk
+    // Render Free tier deletes all local files in /uploads when the server restarts!
+    if (!fs.existsSync(absolutePath)) {
+      return res.status(404).json({ 
+        message: "File no longer exists on the server. (Render free tier deletes local files on restart. Please upload a new video to test.)" 
+      });
+    }
+
     res.download(absolutePath, videodata.filename, async (err) => {
       if (err) {
         console.error("Download error:", err);
