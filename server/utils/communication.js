@@ -33,15 +33,17 @@ const createTransport = () =>
 
 export const sendEmail = async ({ to, subject, text, html, attachments = [] }) => {
   // Use EmailJS to bypass Render's SMTP block!
-  const serviceId = process.env.EMAILJS_SERVICE_ID || "service_jzl5jzo";
+  const serviceId = process.env.EMAILJS_SERVICE_ID || "service_xwu0xjd";
   const templateId = process.env.EMAILJS_TEMPLATE_ID || "template_76f3o1p";
   const publicKey = process.env.EMAILJS_PUBLIC_KEY || "MgFoxLCcnnrltV1gv";
+  const privateKey = process.env.EMAILJS_PRIVATE_KEY || "GqSNeCTuN8ndBIra0b6u4";
 
   try {
     const payload = {
       service_id: serviceId,
       template_id: templateId,
       user_id: publicKey,
+      accessToken: privateKey,
       template_params: {
         to_email: to,
         subject: subject,
