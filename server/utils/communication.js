@@ -18,16 +18,16 @@ export const writeInvoiceToDisk = async ({ invoiceNumber, content }) => {
 };
 
 const isSmtpConfigured = () =>
-  Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+  Boolean(process.env.SMTP_HOST?.trim() && process.env.SMTP_USER?.trim() && process.env.SMTP_PASS?.trim());
 
 const createTransport = () =>
   nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT || 587),
-    secure: process.env.SMTP_SECURE === "true",
+    host: process.env.SMTP_HOST?.trim(),
+    port: Number(process.env.SMTP_PORT?.trim() || 587),
+    secure: process.env.SMTP_SECURE?.trim() === "true",
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: process.env.SMTP_USER?.trim(),
+      pass: process.env.SMTP_PASS?.trim(),
     },
   });
 
@@ -40,7 +40,7 @@ const sendEmail = async ({ to, subject, text, html, attachments = [] }) => {
   const transporter = createTransport();
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      from: process.env.SMTP_FROM?.trim() || process.env.SMTP_USER?.trim(),
       to,
       subject,
       text,
