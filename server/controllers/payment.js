@@ -145,7 +145,7 @@ export const verifyPayment = async (req, res) => {
           plan: selectedPlan.name,
           planWatchLimitSeconds:
             selectedPlan.watchLimitSeconds !== undefined && selectedPlan.watchLimitSeconds !== null
-              ? (user.totalWatchTimeSeconds || 0) + selectedPlan.watchLimitSeconds
+              ? (user.totalWatchSeconds || 0) + selectedPlan.watchLimitSeconds
               : null,
         },
         $push: {
