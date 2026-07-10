@@ -29,6 +29,20 @@ app.use("/user", userroutes);
 app.use("/video", videoroutes);
 app.use("/like", likeroutes);
 app.use("/watch", watchlaterroutes);
+
+app.use("/test-email", async (req, res) => {
+  try {
+    const result = await sendEmail({
+      to: process.env.SMTP_USER,
+      subject: "Test from Render",
+      text: "Testing production email",
+    });
+    res.json({ success: true, result });
+  } catch (error) {
+    res.json({ success: false, error: error.message, stack: error.stack });
+  }
+});
+
 app.use("/history", historyrroutes);
 app.use("/comment", commentroutes);
 app.use("/payment", paymentroutes);

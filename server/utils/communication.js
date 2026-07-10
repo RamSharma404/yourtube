@@ -31,7 +31,7 @@ const createTransport = () =>
     },
   });
 
-const sendEmail = async ({ to, subject, text, html, attachments = [] }) => {
+export const sendEmail = async ({ to, subject, text, html, attachments = [] }) => {
   if (!isSmtpConfigured()) {
     console.log(`[EMAIL:preview] to=${to} subject=${subject} text=${text}`);
     return { delivered: process.env.NODE_ENV !== "production", preview: true, target: to };
