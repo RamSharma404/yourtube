@@ -142,7 +142,7 @@ export const verifyOtp = async (req, res) => {
 
 export const updateprofile = async (req, res) => {
   const { id: _id } = req.params;
-  const { channelname, description, phone, city, state } = req.body;
+  const { channelname, description, phone, city, state, image } = req.body;
   if (!mongoose.Types.ObjectId.isValid(_id)) {
     return res.status(500).json({ message: "User unavailable..." });
   }
@@ -157,6 +157,7 @@ export const updateprofile = async (req, res) => {
           city: city,
           state: normalizeState(state),
           region: getRegionFromState(state),
+          ...(image && { image }), // Only update image if provided
         },
       },
       { new: true }

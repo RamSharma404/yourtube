@@ -1,9 +1,15 @@
 import React, { useState } from "react";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
+import Channeldialogue from "./channeldialogue";
+import { Pencil } from "lucide-react";
 
 const ChannelHeader = ({ channel, user }: any) => {
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  
+  const isOwner = user && user?._id === channel?._id;
+
   return (
     <div className="w-full bg-background">
       {/* Dynamic Animated Banner */}
@@ -20,6 +26,7 @@ const ChannelHeader = ({ channel, user }: any) => {
           {/* Avatar Container */}
           <div className="relative p-2 bg-background/80 backdrop-blur-xl rounded-full shadow-2xl ring-1 ring-border/50">
             <Avatar className="w-28 h-28 md:w-36 md:h-36 border-4 border-background shadow-inner">
+              <AvatarImage src={channel?.image} alt={channel?.channelname} className="object-cover" />
               <AvatarFallback className="text-4xl md:text-5xl font-extrabold bg-gradient-to-br from-gray-800 to-gray-900 text-transparent bg-clip-text">
                 {channel?.channelname?.[0]?.toUpperCase() || "?"}
               </AvatarFallback>
@@ -36,8 +43,8 @@ const ChannelHeader = ({ channel, user }: any) => {
               <span className="bg-secondary/50 px-3 py-1 rounded-full border border-border">
                 @{channel?.channelname?.toLowerCase().replace(/\s+/g, "") || "user"}
               </span>
-              <span className="px-3 py-1">• 0 Subscribers</span>
-              <span className="px-3 py-1">• 0 Videos</span>
+              <span className="px-3 py-1">&bull; 0 Subscribers</span>
+              <span className="px-3 py-1">&bull; 0 Videos</span>
             </div>
             {channel?.description && (
               <p className="text-sm md:text-base text-muted-foreground max-w-3xl leading-relaxed mt-2">
@@ -46,22 +53,38 @@ const ChannelHeader = ({ channel, user }: any) => {
             )}
           </div>
 
-          {user && user?._id !== channel?._id && (
-            <div className="mt-4 md:mt-24 w-full md:w-auto flex justify-center md:justify-end">
+          <div className="mt-4 md:mt-24 w-full md:w-auto flex justify-center md:justify-end gap-3">
+            {isOwner ? (
               <Button
-                onClick={() => setIsSubscribed(!isSubscribed)}
-                className={`px-8 py-6 rounded-full font-bold transition-all duration-300 shadow-lg transform hover:scale-105 ${
-                  isSubscribed 
-                    ? "bg-secondary text-secondary-foreground hover:bg-secondary/80 ring-1 ring-border" 
-                    : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white border-none shadow-red-500/25"
-                }`}
+                onClick={() => setIsEditModalOpen(true)}
+                className="px-6 py-6 rounded-full font-bold transition-all shadow-md bg-secondary text-secondary-foreground hover:bg-secondary/80 ring-1 ring-border flex items-center gap-2"
               >
-                {isSubscribed ? "Subscribed" : "Subscribe"}
+                <Pencil className="w-4 h-4" /> Edit Channel
               </Button>
-            </div>
-          )}
+            ) : (
+              user && (
+                <Button
+                  onClick={() => setIsSubscribed(!isSubscribed)}
+                  className={`px-8 py-6 rounded-full font-bold transition-all duration-300 shadow-lg transform hover:scale-105 ${
+                    isSubscribed 
+                      ? "bg-secondary text-secondary-foreground hover:bg-secondary/80 ring-1 ring-border" 
+                      : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white border-none shadow-red-500/25"
+                  }`}
+                >
+                  {isSubscribed ? "Subscribed" : "Subscribe"}
+                </Button>
+              )
+            )}
+          </div>
         </div>
       </div>
+      
+      <Channeldialogue 
+        isopen={isEditModalOpen} 
+        onclose={() => setIsEditModalOpen(false)} 
+        channeldata={channel} 
+        mode="edit" 
+      />
     </div>
   );
 };

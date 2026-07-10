@@ -5,10 +5,6 @@ import { motion } from "framer-motion";
 const tabs = [
   { id: "home", label: "Home" },
   { id: "videos", label: "Videos" },
-  { id: "shorts", label: "Shorts" },
-  { id: "playlists", label: "Playlists" },
-  { id: "community", label: "Community" },
-  { id: "about", label: "About" },
 ];
 
 const Channeltabs = () => {
