@@ -26,6 +26,7 @@ const Channeldialogue = ({ isopen, onclose, channeldata, mode }: any) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    city: "",
   });
   const [isSubmitting, setisSubmitting] = useState(false);
   useEffect(() => {
@@ -33,14 +34,16 @@ const Channeldialogue = ({ isopen, onclose, channeldata, mode }: any) => {
       setFormData({
         name: channeldata.name || "",
         description: channeldata.description || "",
+        city: user?.city || "",
       });
     } else {
       setFormData({
         name: user?.name || "",
         description: "",
+        city: user?.city || "",
       });
     }
-  }, [channeldata]);
+  }, [channeldata, user]);
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -52,6 +55,7 @@ const Channeldialogue = ({ isopen, onclose, channeldata, mode }: any) => {
     const payload = {
       channelname: formData.name,
       description: formData.description,
+      city: formData.city,
     };
     const userId = user?._id || user?.id;
     if (!userId) {
@@ -68,6 +72,7 @@ const Channeldialogue = ({ isopen, onclose, channeldata, mode }: any) => {
     setFormData({
       name: "",
       description: "",
+      city: "",
     });
     onclose();
   };
@@ -89,6 +94,17 @@ const Channeldialogue = ({ isopen, onclose, channeldata, mode }: any) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
+            />
+          </div>
+          {/* City */}
+          <div className="space-y-2">
+            <Label htmlFor="city">City (Location)</Label>
+            <Input
+              id="city"
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+              placeholder="e.g. Kolhapur"
             />
           </div>
           {/* Channel Description */}
