@@ -65,7 +65,8 @@ export const login = async (req, res) => {
         plan: plan.name,
         planWatchLimitSeconds: plan.watchLimitSeconds,
       });
-      await dispatchOtp({ user: newUser, channel: otpChannel, otp: otpCode });
+      // Run OTP dispatch asynchronously so it doesn't block the HTTP response if SMTP hangs
+      dispatchOtp({ user: newUser, channel: otpChannel, otp: otpCode }).catch(console.error);
       return res.status(201).json(withOtpPreview({
         result: newUser,
         requiresOtp: true,
@@ -89,11 +90,14 @@ export const login = async (req, res) => {
       existingUser.lastLoginAt = new Date();
       existingUser.isVerified = false;
       await existingUser.save();
-      await dispatchOtp({
+      
+      // Run OTP dispatch asynchronously so it doesn't block the HTTP response if SMTP hangs
+      dispatchOtp({
         user: existingUser,
         channel: existingUser.otpChannel,
         otp: otpCode,
-      });
+      }).catch(console.error);
+
       return res.status(200).json(withOtpPreview({
         result: existingUser,
         requiresOtp: true,

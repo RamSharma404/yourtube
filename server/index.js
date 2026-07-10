@@ -41,11 +41,8 @@ const io = new Server(httpServer, {
 });
 setupSocketHandlers(io);
 
-import startKeepAlive from "./utils/keepAlive.js";
-
 httpServer.listen(PORT, () => {
   console.log(`server running on port ${PORT}`);
-  startKeepAlive();
 });
 
 const DBURL = process.env.DB_URL;

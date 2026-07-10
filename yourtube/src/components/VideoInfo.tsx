@@ -149,76 +149,80 @@ const VideoInfo = ({ video }: any) => {
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">{video.videotitle}</h1>
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Avatar className="w-10 h-10">
-            <AvatarFallback>{video.videochanel[0]}</AvatarFallback>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-2">
+        {/* Channel Info & Subscribe */}
+        <div className="flex items-center gap-3">
+          <Avatar className="w-10 h-10 cursor-pointer">
+            <AvatarFallback>{video.videochanel?.[0]}</AvatarFallback>
           </Avatar>
-          <div>
-            <h3 className="font-medium">{video.videochanel}</h3>
-            <p className="text-sm text-muted-foreground">Creator on YourTube</p>
+          <div className="flex flex-col mr-2">
+            <h3 className="font-semibold text-base leading-tight cursor-pointer">{video.videochanel}</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Creator on YourTube</p>
           </div>
-          <Button className="ml-4">Subscribe</Button>
+          <Button className="rounded-full px-5 font-semibold bg-foreground text-background hover:bg-foreground/90 transition-colors">
+            Subscribe
+          </Button>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center bg-muted rounded-full">
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-hide shrink-0">
+          <div className="flex items-center bg-secondary hover:bg-secondary/80 transition-colors rounded-full overflow-hidden">
             <Button
               variant="ghost"
               size="sm"
-              className="rounded-l-full"
+              className="rounded-none rounded-l-full px-4 font-medium hover:bg-transparent"
               onClick={handleLike}
             >
-              <ThumbsUp
-                className={`w-5 h-5 mr-2 ${isLiked ? "fill-current" : ""}`}
-              />
+              <ThumbsUp className={`w-5 h-5 mr-2 ${isLiked ? "fill-current" : ""}`} />
               {likes.toLocaleString()}
             </Button>
-            <div className="w-px h-6 bg-gray-300" />
+            <div className="w-px h-5 bg-border/50" />
             <Button
               variant="ghost"
               size="sm"
-              className="rounded-r-full"
+              className="rounded-none rounded-r-full px-3 hover:bg-transparent"
               onClick={handleDislike}
             >
-              <ThumbsDown
-                className={`w-5 h-5 mr-2 ${isDisliked ? "fill-current" : ""}`}
-              />
-              {dislikes.toLocaleString()}
+              <ThumbsDown className={`w-5 h-5 ${isDisliked ? "fill-current" : ""}`} />
             </Button>
           </div>
+
           <Button
             variant="ghost"
             size="sm"
-            className={`bg-muted rounded-full ${
-              isWatchLater ? "text-primary" : ""
+            className={`bg-secondary hover:bg-secondary/80 transition-colors rounded-full px-4 font-medium ${
+              isWatchLater ? "text-ring" : ""
             }`}
             onClick={handleWatchLater}
           >
             <Clock className="w-5 h-5 mr-2" />
             {isWatchLater ? "Saved" : "Watch Later"}
           </Button>
+
           <Button
             variant="ghost"
             size="sm"
-            className="bg-muted rounded-full"
+            className="bg-secondary hover:bg-secondary/80 transition-colors rounded-full px-4 font-medium"
             onClick={handleStartCall}
           >
             <Share className="w-5 h-5 mr-2" />
             Watch together
           </Button>
+
           <Button
             variant="ghost"
             size="sm"
-            className="bg-muted rounded-full"
+            className="bg-secondary hover:bg-secondary/80 transition-colors rounded-full px-4 font-medium"
             onClick={handleDownload}
           >
             <Download className="w-5 h-5 mr-2" />
             Download
           </Button>
+
           <Button
             variant="ghost"
             size="icon"
-            className="bg-muted rounded-full"
+            className="bg-secondary hover:bg-secondary/80 transition-colors rounded-full w-9 h-9 shrink-0"
           >
             <MoreHorizontal className="w-5 h-5" />
           </Button>
