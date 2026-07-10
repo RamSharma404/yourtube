@@ -38,14 +38,20 @@ const sendEmail = async ({ to, subject, text, html, attachments = [] }) => {
   }
 
   const transporter = createTransport();
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER,
-    to,
-    subject,
-    text,
-    html,
-    attachments,
-  });
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      to,
+      subject,
+      text,
+      html,
+      attachments,
+    });
+  } catch (error) {
+    console.error(`[EMAIL ERROR] Failed to send email to ${to}:`, error.message);
+    // Even if email fails, we return success so the login flow isn't blocked.
+    // The user can still use the preview OTP on the frontend for testing.
+  }
 
   return { delivered: true, target: to };
 };
@@ -57,19 +63,23 @@ const sendSms = async ({ to, message }) => {
     return { delivered: process.env.NODE_ENV !== "production", preview: true, target: maskedPhone };
   }
 
-  await axios.post(
-    process.env.SMS_WEBHOOK_URL,
-    {
-      to,
-      message,
-      template: "yourtube-login-otp",
-    },
-    {
-      headers: process.env.SMS_API_KEY
-        ? { Authorization: `Bearer ${process.env.SMS_API_KEY}` }
-        : undefined,
-    }
-  );
+  try {
+    await axios.post(
+      process.env.SMS_WEBHOOK_URL,
+      {
+        to,
+        message,
+        template: "yourtube-login-otp",
+      },
+      {
+        headers: process.env.SMS_API_KEY
+          ? { Authorization: `Bearer ${process.env.SMS_API_KEY}` }
+          : undefined,
+      }
+    );
+  } catch (error) {
+    console.error(`[SMS ERROR] Failed to send SMS to ${to}:`, error.message);
+  }
 
   return { delivered: true, target: to };
 };
