@@ -123,9 +123,11 @@ export default function VideoPlayer({
     }
 
     if (zone === "right" && taps === 3) {
-      // Browsers often block window.close() unless opened by a script, 
-      // but as requested, we strictly attempt to close the tab without a fallback redirect.
-      window.close();
+      // Browsers often block window.close(), so we redirect to home as a fallback
+      try {
+        window.close();
+      } catch (e) {}
+      window.location.href = "/";
       return;
     }
 
@@ -186,15 +188,18 @@ function TapZone({
 
   const handleClick = () => {
     tapCountRef.current += 1;
+    
+    // Trigger the action immediately so the user gets instant feedback
+    onAction(zone, tapCountRef.current);
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
 
+    // Reset the tap counter after 400ms of inactivity
     timeoutRef.current = setTimeout(() => {
-      onAction(zone, tapCountRef.current);
       tapCountRef.current = 0;
-    }, 350);
+    }, 400);
   };
 
   return <button type="button" className="h-full w-full cursor-pointer bg-transparent" onClick={handleClick} />;
