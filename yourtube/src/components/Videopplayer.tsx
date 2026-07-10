@@ -83,6 +83,91 @@ export default function VideoPlayer({
     if (videoRef.current.paused) {
       videoRef.current.play();
       setPaused(false);
+"use client";
+
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { MessageSquare, Pause, Play, SkipForward, X } from "lucide-react";
+import axiosInstance from "@/lib/axiosinstance";
+import { useUser } from "@/lib/AuthContext";
+
+interface VideoPlayerProps {
+  video: {
+    _id: string;
+    videotitle: string;
+    filepath: string;
+  };
+  watchLimitSeconds?: number | null;
+  nextVideoId?: string | null;
+  onOpenComments?: () => void;
+}
+
+export default function VideoPlayer({
+  video,
+  watchLimitSeconds,
+  nextVideoId,
+  onOpenComments,
+}: VideoPlayerProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [paused, setPaused] = useState(false);
+  const [watchBlocked, setWatchBlocked] = useState(false);
+
+  const { user } = useUser();
+
+  useEffect(() => {
+    setWatchBlocked(false);
+    setPaused(false);
+  }, [video?._id]);
+
+  const watchLimitLabel =
+    watchLimitSeconds == null ? "unlimited" : `${Math.floor(watchLimitSeconds / 60)} minutes`;
+
+  useEffect(() => {
+    const element = videoRef.current;
+    if (!element) return;
+
+    let heartbeatInterval: NodeJS.Timeout;
+
+    const startHeartbeat = () => {
+      heartbeatInterval = setInterval(async () => {
+        if (!user?._id || element.paused) return;
+        
+        try {
+          await axiosInstance.post("/user/watch-heartbeat", {
+            userId: user._id,
+            secondsWatched: 5,
+          });
+        } catch (error: any) {
+          if (error?.response?.status === 403) {
+            element.pause();
+            setWatchBlocked(true);
+          }
+        }
+      }, 5000);
+    };
+
+    const handlePlay = () => startHeartbeat();
+    const handlePause = () => clearInterval(heartbeatInterval);
+
+    element.addEventListener("play", handlePlay);
+    element.addEventListener("pause", handlePause);
+
+    return () => {
+      clearInterval(heartbeatInterval);
+      element.removeEventListener("play", handlePlay);
+      element.removeEventListener("pause", handlePause);
+    };
+  }, [user?._id]);
+
+  const seekBy = (seconds: number) => {
+    if (!videoRef.current) return;
+    videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime + seconds);
+  };
+
+  const togglePlayPause = () => {
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      videoRef.current.play();
+      setPaused(false);
     } else {
       videoRef.current.pause();
       setPaused(true);
@@ -111,8 +196,9 @@ export default function VideoPlayer({
     }
 
     if (zone === "right" && taps === 3) {
+      // Browsers often block window.close() unless opened by a script, 
+      // but as requested, we strictly attempt to close the tab without a fallback redirect.
       window.close();
-      window.location.href = "/";
       return;
     }
 
@@ -178,10 +264,11 @@ function TapZone({
       clearTimeout(timeoutRef.current);
     }
 
+    // Lowered from 260ms to 190ms for snappier response times
     timeoutRef.current = setTimeout(() => {
       onAction(zone, tapCountRef.current);
       tapCountRef.current = 0;
-    }, 260);
+    }, 190);
   };
 
   return <button type="button" className="h-full w-full cursor-pointer bg-transparent" onClick={handleClick} />;
