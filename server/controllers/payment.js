@@ -144,7 +144,9 @@ export const verifyPayment = async (req, res) => {
           dailyDownloadCount: 0,
           plan: selectedPlan.name,
           planWatchLimitSeconds:
-            selectedPlan.watchLimitSeconds ?? null,
+            selectedPlan.watchLimitSeconds !== undefined && selectedPlan.watchLimitSeconds !== null
+              ? (user.totalWatchTimeSeconds || 0) + selectedPlan.watchLimitSeconds
+              : null,
         },
         $push: {
           paymentHistory: {
