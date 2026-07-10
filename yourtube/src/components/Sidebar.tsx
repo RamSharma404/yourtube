@@ -58,8 +58,8 @@ const Sidebar = () => {
     <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-60 shrink-0 overflow-y-auto border-r border-border bg-background p-3 md:block">
       <nav className="space-y-1">
         <NavItem href="/" icon={Home} label="Home" />
-        <NavItem href="/explore" icon={Compass} label="Explore" disabled />
-        <NavItem href="/subscriptions" icon={PlaySquare} label="Subscriptions" disabled />
+        <NavItem href="/explore" icon={Compass} label="Explore" />
+        <NavItem href="/subscriptions" icon={PlaySquare} label="Subscriptions" />
         <NavItem href="/call" icon={Phone} label="Video Call" />
 
         {user && (
