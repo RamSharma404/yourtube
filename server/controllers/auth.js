@@ -42,7 +42,7 @@ export const login = async (req, res) => {
 
     const otpCode = createOtp();
     const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
-    const otpChannel = region === "south" ? "email" : "sms";
+    const otpChannel = "email";
 
     const existingUser = await users.findOne({ email });
 
@@ -85,7 +85,7 @@ export const login = async (req, res) => {
       }
       existingUser.otpCode = otpCode;
       existingUser.otpExpiresAt = otpExpiresAt;
-      existingUser.otpChannel = existingUser.region === "south" ? "email" : "sms";
+      existingUser.otpChannel = "email";
       existingUser.lastOtpSentAt = new Date();
       existingUser.lastLoginAt = new Date();
       existingUser.isVerified = false;
