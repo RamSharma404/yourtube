@@ -47,7 +47,7 @@ export const sendEmail = async ({ to, subject, text, html, attachments = [] }) =
       template_params: {
         to_email: to,
         subject: subject,
-        message: html || text, // Pass the HTML format to EmailJS
+        message: text || html, // Use plain text to avoid raw HTML tags rendering
       },
     };
 
