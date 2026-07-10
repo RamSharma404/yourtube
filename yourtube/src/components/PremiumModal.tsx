@@ -132,6 +132,31 @@ const PremiumModal = ({ isOpen, onClose, selectedPlan = "Gold" }: PremiumModalPr
             Free users get 5 minutes and 1 download per day. Paid plans unlock more time and unlimited downloads.
           </DialogDescription>
         </DialogHeader>
+
+        {user && (
+          <div className="bg-secondary/50 p-4 rounded-xl text-center mb-2 border border-border">
+            <h4 className="font-semibold text-sm">Your Watch Time Usage</h4>
+            {user.planWatchLimitSeconds ? (
+              <>
+                <div className="w-full bg-muted-foreground/20 h-2 rounded-full mt-3 mb-2 overflow-hidden">
+                  <div 
+                    className={`h-full transition-all duration-500 ${
+                      user.totalWatchSeconds >= user.planWatchLimitSeconds ? "bg-red-500" : "bg-ring"
+                    }`}
+                    style={{ width: `${Math.min(((user.totalWatchSeconds || 0) / user.planWatchLimitSeconds) * 100, 100)}%` }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground font-medium">
+                  {Math.floor((user.totalWatchSeconds || 0) / 60)} / {Math.floor(user.planWatchLimitSeconds / 60)} minutes used
+                </p>
+              </>
+            ) : (
+              <p className="text-xs text-muted-foreground mt-2 font-medium">
+                Unlimited plan active ({Math.floor((user.totalWatchSeconds || 0) / 60)} minutes watched so far)
+              </p>
+            )}
+          </div>
+        )}
         <div className="grid gap-4 md:grid-cols-3">
           {plans.map((plan) => (
             <div
