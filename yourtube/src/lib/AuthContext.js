@@ -124,6 +124,8 @@ export const UserProvider = ({ children }) => {
     } catch (error) {
       if (error.code === "auth/popup-blocked") {
         alert("Your browser is blocking the Google Sign-In popup. Please allow popups for this website in your browser settings (look for an icon in your URL address bar).");
+      } else {
+        alert("Login Error: " + (error.response?.data?.message || error.message || JSON.stringify(error)));
       }
       console.error(error);
     }
