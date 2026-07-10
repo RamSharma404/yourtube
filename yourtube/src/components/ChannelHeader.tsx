@@ -36,8 +36,8 @@ const ChannelHeader = ({ channel, user }: any) => {
               <span className="bg-secondary/50 px-3 py-1 rounded-full border border-border">
                 @{channel?.channelname?.toLowerCase().replace(/\s+/g, "") || "user"}
               </span>
-              <span className="px-3 py-1">• 124K Subscribers</span>
-              <span className="px-3 py-1">• 42 Videos</span>
+              <span className="px-3 py-1">• 0 Subscribers</span>
+              <span className="px-3 py-1">• 0 Videos</span>
             </div>
             {channel?.description && (
               <p className="text-sm md:text-base text-muted-foreground max-w-3xl leading-relaxed mt-2">
