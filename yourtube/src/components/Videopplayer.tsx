@@ -191,11 +191,10 @@ function TapZone({
       clearTimeout(timeoutRef.current);
     }
 
-    // Lowered from 260ms to 190ms for snappier response times
     timeoutRef.current = setTimeout(() => {
       onAction(zone, tapCountRef.current);
       tapCountRef.current = 0;
-    }, 190);
+    }, 350);
   };
 
   return <button type="button" className="h-full w-full cursor-pointer bg-transparent" onClick={handleClick} />;

@@ -14,6 +14,15 @@ export default function VideoCard({ video }: any) {
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
+  const [duration, setDuration] = useState<number>(0);
+
+  const formatDuration = (seconds: number) => {
+    if (!seconds) return "0:00";
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
   const handleDownload = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -69,7 +78,13 @@ export default function VideoCard({ video }: any) {
               muted
               preload="metadata"
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
             />
+            {duration > 0 && (
+              <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                {formatDuration(duration)}
+              </div>
+            )}
           </div>
           <div className="flex gap-3">
             <Avatar className="w-9 h-9 flex-shrink-0">
