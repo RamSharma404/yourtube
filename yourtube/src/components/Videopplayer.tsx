@@ -73,6 +73,18 @@ export default function VideoPlayer({
     };
   }, [user?._id]);
 
+  useEffect(() => {
+    // If the user upgraded their plan while the video was blocked,
+    // automatically unblock them and instantly resume playback!
+    if (watchBlocked && user && user.plan !== "Free") {
+      setWatchBlocked(false);
+      if (videoRef.current) {
+        videoRef.current.play();
+        setPaused(false);
+      }
+    }
+  }, [user?.plan, watchBlocked]);
+
   const seekBy = (seconds: number) => {
     if (!videoRef.current) return;
     videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime + seconds);
