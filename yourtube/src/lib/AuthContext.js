@@ -14,11 +14,20 @@ const SOUTHERN_STATES = new Set([
 ]);
 
 const getLocationDetails = async () => {
-  // TEMPORARY OVERRIDE FOR INTERNSHIP TESTING: Force South India Location
-  return {
-    city: "Chennai",
-    state: "Tamil Nadu",
-  };
+  try {
+    const res = await fetch("https://ipapi.co/json/");
+    const data = await res.json();
+    return {
+      city: data.city || "",
+      state: data.region || "",
+    };
+  } catch (error) {
+    console.error("Failed to fetch IP location:", error);
+    return {
+      city: "",
+      state: "",
+    };
+  }
 };
 
 const getThemeFromSession = (user) => {
