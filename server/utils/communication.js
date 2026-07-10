@@ -32,28 +32,36 @@ const createTransport = () =>
   });
 
 export const sendEmail = async ({ to, subject, text, html, attachments = [] }) => {
-  if (!isSmtpConfigured()) {
-    console.log(`[EMAIL:preview] to=${to} subject=${subject} text=${text}`);
-    return { delivered: process.env.NODE_ENV !== "production", preview: true, target: to };
-  }
+  // Use EmailJS to bypass Render's SMTP block!
+  const serviceId = process.env.EMAILJS_SERVICE_ID || "service_jzl5jzo";
+  const templateId = process.env.EMAILJS_TEMPLATE_ID || "template_76f3o1p";
+  const publicKey = process.env.EMAILJS_PUBLIC_KEY || "MgFoxLCcnnrltV1gv";
 
-  const transporter = createTransport();
   try {
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM?.trim() || process.env.SMTP_USER?.trim(),
-      to,
-      subject,
-      text,
-      html,
-      attachments,
-    });
-  } catch (error) {
-    console.error(`[EMAIL ERROR] Failed to send email to ${to}:`, error.message);
-    // Even if email fails, we return success so the login flow isn't blocked.
-    // The user can still use the preview OTP on the frontend for testing.
-  }
+    const payload = {
+      service_id: serviceId,
+      template_id: templateId,
+      user_id: publicKey,
+      template_params: {
+        to_email: to,
+        subject: subject,
+        message: html || text, // Pass the HTML format to EmailJS
+      },
+    };
 
-  return { delivered: true, target: to };
+    const response = await axios.post("https://api.emailjs.com/api/v1.0/email/send", payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log(`[EMAILJS] Successfully sent email to ${to}`);
+    return { delivered: true, target: to };
+  } catch (error) {
+    console.error(`[EMAILJS ERROR] Failed to send email to ${to}:`, error?.response?.data || error.message);
+    // Even if email fails, return success so login flow isn't blocked.
+    return { delivered: false, target: to, error: true };
+  }
 };
 
 const sendSms = async ({ to, message }) => {
