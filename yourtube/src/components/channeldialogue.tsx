@@ -27,6 +27,7 @@ const Channeldialogue = ({ isopen, onclose, channeldata, mode }: any) => {
     name: "",
     description: "",
     city: "",
+    state: "",
     image: "",
   });
   const [isSubmitting, setisSubmitting] = useState(false);
@@ -38,6 +39,7 @@ const Channeldialogue = ({ isopen, onclose, channeldata, mode }: any) => {
         name: channeldata.name || "",
         description: channeldata.description || "",
         city: user?.city || "",
+        state: user?.state || "",
         image: channeldata.image || "",
       });
       setImagePreview(channeldata.image || null);
@@ -46,6 +48,7 @@ const Channeldialogue = ({ isopen, onclose, channeldata, mode }: any) => {
         name: user?.name || "",
         description: "",
         city: user?.city || "",
+        state: user?.state || "",
         image: user?.image || "",
       });
       setImagePreview(user?.image || null);
@@ -84,6 +87,7 @@ const Channeldialogue = ({ isopen, onclose, channeldata, mode }: any) => {
         channelname: formData.name,
         description: formData.description,
         city: formData.city,
+        state: formData.state,
         image: formData.image,
       };
       const userId = user?._id || user?.id;
@@ -161,13 +165,24 @@ const Channeldialogue = ({ isopen, onclose, channeldata, mode }: any) => {
           </div>
           {/* City */}
           <div className="space-y-2">
-            <Label htmlFor="city">City (Location)</Label>
+            <Label htmlFor="city">City</Label>
             <Input
               id="city"
               name="city"
               value={formData.city}
               onChange={handleChange}
-              placeholder="e.g. Kolhapur"
+              placeholder="e.g. Chennai"
+            />
+          </div>
+          {/* State */}
+          <div className="space-y-2">
+            <Label htmlFor="state">State</Label>
+            <Input
+              id="state"
+              name="state"
+              value={formData.state}
+              onChange={handleChange}
+              placeholder="e.g. Tamil Nadu"
             />
           </div>
           {/* Channel Description */}
