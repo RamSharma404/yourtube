@@ -81,10 +81,6 @@ export default function LikedVideosContent() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <p className="text-sm text-gray-600">{likedVideos.length} videos</p>
-        <Button className="flex items-center gap-2">
-          <Play className="w-4 h-4" />
-          Play all
-        </Button>
       </div>
 
       <div className="space-y-4">

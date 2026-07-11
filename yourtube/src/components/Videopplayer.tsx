@@ -26,7 +26,7 @@ export default function VideoPlayer({
   const [paused, setPaused] = useState(false);
   const [watchBlocked, setWatchBlocked] = useState(false);
 
-  const { user } = useUser();
+  const { user, setUser } = useUser();
 
   useEffect(() => {
     setWatchBlocked(false);
@@ -47,14 +47,21 @@ export default function VideoPlayer({
         if (!user?._id || element.paused) return;
         
         try {
-          await axiosInstance.post("/user/watch-heartbeat", {
+          const res = await axiosInstance.post("/user/watch-heartbeat", {
             userId: user._id,
             secondsWatched: 5,
           });
+          // Instantly sync the global context with the live watch time!
+          if (res.data.totalWatchSeconds !== undefined) {
+            setUser({ ...user, totalWatchSeconds: res.data.totalWatchSeconds });
+          }
         } catch (error: any) {
           if (error?.response?.status === 403) {
             element.pause();
             setWatchBlocked(true);
+            if (error.response.data.totalWatchSeconds !== undefined) {
+              setUser({ ...user, totalWatchSeconds: error.response.data.totalWatchSeconds });
+            }
           }
         }
       }, 5000);
