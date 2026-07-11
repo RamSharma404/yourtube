@@ -29,8 +29,7 @@ const withOtpPreview = (payload, otpCode) => ({
 });
 
 export const login = async (req, res) => {
-  const { email, name, image, phone, city } = req.body;
-  const state = "Tamil Nadu"; // Hardcoded for testing purposes
+  const { email, name, image, phone, city, state } = req.body;
 
   try {
     const normalizedState = normalizeState(state);
