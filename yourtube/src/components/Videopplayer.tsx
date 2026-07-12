@@ -27,6 +27,11 @@ export default function VideoPlayer({
   const [watchBlocked, setWatchBlocked] = useState(false);
 
   const { user, setUser } = useUser();
+  const latestUser = useRef(user);
+
+  useEffect(() => {
+    latestUser.current = user;
+  }, [user]);
 
   useEffect(() => {
     setWatchBlocked(false);
@@ -52,16 +57,16 @@ export default function VideoPlayer({
             secondsWatched: 5,
           });
           // Instantly sync the global context with the live watch time!
-          if (res.data.totalWatchSeconds !== undefined) {
-            setUser({ ...user, totalWatchSeconds: res.data.totalWatchSeconds });
+          if (res.data.totalWatchSeconds !== undefined && latestUser.current) {
+            setUser({ ...latestUser.current, totalWatchSeconds: res.data.totalWatchSeconds });
           }
         } catch (error: any) {
           if (error?.response?.status === 403) {
             clearInterval(heartbeatInterval);
             element.pause();
             setWatchBlocked(true);
-            if (error.response.data.totalWatchSeconds !== undefined) {
-              setUser({ ...user, totalWatchSeconds: error.response.data.totalWatchSeconds });
+            if (error.response.data.totalWatchSeconds !== undefined && latestUser.current) {
+              setUser({ ...latestUser.current, totalWatchSeconds: error.response.data.totalWatchSeconds });
             }
           }
         }
