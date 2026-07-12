@@ -13,6 +13,7 @@ import historyrroutes from "./routes/history.js";
 import commentroutes from "./routes/comment.js";
 import paymentroutes from "./routes/payment.js";
 import downloadroutes from "./routes/download.js";
+import video from "./Modals/video.js";
 import { setupSocketHandlers } from "./socket/handler.js";
 dotenv.config();
 const app = express();
@@ -62,8 +63,16 @@ httpServer.listen(PORT, () => {
 const DBURL = process.env.DB_URL;
 mongoose
   .connect(DBURL)
-  .then(() => {
+  .then(async () => {
     console.log("Mongodb connected");
+    // Clear out "ghost" videos from the database on server restart
+    // because Render Free Tier deletes the physical local files in /uploads automatically!
+    try {
+      await video.deleteMany({});
+      console.log("Cleaned up ephemeral videos from the database.");
+    } catch (err) {
+      console.error("Failed to clean up videos:", err);
+    }
   })
   .catch((error) => {
     console.log(error);
