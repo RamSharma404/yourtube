@@ -131,10 +131,21 @@ const VideoInfo = ({ video }: any) => {
       link.click();
       window.URL.revokeObjectURL(blobUrl);
     } catch (error: any) {
-      const message =
-        error?.response?.data?.message ||
-        "Download failed. Upgrade your plan for unlimited downloads.";
-      if (error?.response?.status === 403) {
+      let message = "Download failed. Upgrade your plan for unlimited downloads.";
+      
+      if (error?.response?.data instanceof Blob) {
+        try {
+          const text = await error.response.data.text();
+          const json = JSON.parse(text);
+          message = json.message || message;
+        } catch (e) {
+          // Keep default message if parsing fails
+        }
+      } else {
+        message = error?.response?.data?.message || message;
+      }
+
+      if (error?.response?.status === 403 || message.toLowerCase().includes("limit")) {
         setShowPlanModal(true);
       }
       alert(message);
