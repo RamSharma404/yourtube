@@ -57,6 +57,7 @@ export default function VideoPlayer({
           }
         } catch (error: any) {
           if (error?.response?.status === 403) {
+            clearInterval(heartbeatInterval);
             element.pause();
             setWatchBlocked(true);
             if (error.response.data.totalWatchSeconds !== undefined) {
@@ -83,14 +84,19 @@ export default function VideoPlayer({
   useEffect(() => {
     // If the user upgraded their plan while the video was blocked,
     // automatically unblock them and instantly resume playback!
-    if (watchBlocked && user && user.plan !== "Free") {
-      setWatchBlocked(false);
-      if (videoRef.current) {
-        videoRef.current.play();
-        setPaused(false);
+    if (watchBlocked && user) {
+      const isUnlimited = user.planWatchLimitSeconds === null;
+      const hasTimeLeft = !isUnlimited && (user.totalWatchSeconds || 0) < user.planWatchLimitSeconds;
+      
+      if (isUnlimited || hasTimeLeft) {
+        setWatchBlocked(false);
+        if (videoRef.current) {
+          videoRef.current.play();
+          setPaused(false);
+        }
       }
     }
-  }, [user?.plan, watchBlocked]);
+  }, [user?.planWatchLimitSeconds, user?.totalWatchSeconds, watchBlocked, user]);
 
   const seekBy = (seconds: number) => {
     if (!videoRef.current) return;
